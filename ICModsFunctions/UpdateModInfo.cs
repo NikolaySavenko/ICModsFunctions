@@ -8,16 +8,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net;
-using System.Text;
 
 namespace ICModsFunctions
 {
-    public static class HttpICModsExample
+    public static class UpdateModInfo
     {
         static readonly string descriptionAPI = "https://icmods.mineprogramming.org/api/description";
-        [FunctionName("HttpICModsExample")]
+        [FunctionName("UpdateModInfo")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
+
             ILogger log)
         {
             string modID = req.Query["id"];
@@ -26,21 +26,23 @@ namespace ICModsFunctions
             modID = modID ?? data?.name;
 
             int? downloads = getDownloadsForMod(modID, log);
-            
+
             string responseMessage = downloads == null
                 ? "Fail!"
                 : $"Mod {modID}\nDownloads: {downloads}";
-            
+            // new BadRequestObjectResult()
             return new OkObjectResult(responseMessage);
         }
 
-        public static int? getDownloadsForMod(string modID, ILogger log) {
+        public static int? getDownloadsForMod(string modID, ILogger log)
+        {
             log.LogInformation($"Getting downloads for: {modID}");
             dynamic description = JsonConvert.DeserializeObject(getModDescription(modID, log));
             return description.downloads;
         }
 
-        public static string getModDescription(string modID, ILogger log) {
+        public static string getModDescription(string modID, ILogger log)
+        {
             log.LogInformation($"Getting description for: {modID}");
             string requestURI = getRequestById(modID);
             log.LogInformation($"URI {requestURI}");
@@ -49,8 +51,9 @@ namespace ICModsFunctions
 
             var response = request.GetResponse();
             string description;
-            
-            using (Stream dataStream = response.GetResponseStream()) {
+
+            using (Stream dataStream = response.GetResponseStream())
+            {
                 StreamReader reader = new StreamReader(dataStream);
                 description = reader.ReadToEnd();
                 response.Close();
@@ -59,7 +62,8 @@ namespace ICModsFunctions
             return description;
         }
 
-        public static string getRequestById(string modID) {
+        public static string getRequestById(string modID)
+        {
             return $"{descriptionAPI}?id={modID}";
         }
     }
