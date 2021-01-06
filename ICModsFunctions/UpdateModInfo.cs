@@ -1,16 +1,12 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net;
 using System.Data.SqlClient;
 using System.Text;
-using System.Net.Http;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 
 namespace ICModsFunctions
@@ -19,35 +15,43 @@ namespace ICModsFunctions
     {
         static readonly string descriptionAPI = "https://icmods.mineprogramming.org/api/description";
         static readonly string tableName = "mods_downloads";
+
         [FunctionName("UpdateModInfo")]
-        public static int Run([ActivityTrigger] string input, ILogger log)
+        public static int Run([ActivityTrigger] string modID, ILogger log)
         {
-            string[] data = input.Split(",");
-            string downloads = getDownloadsForMod(data[1], log);
+            if (Int32.TryParse(modID, out int downloadsCount)) {
+                log.LogInformation($"{modID}");
+                string downloads = getDownloadsForMod(modID, log);
 
-            if (!String.IsNullOrEmpty(downloads))
-            {
-                Task.Run(() => updateTableAsync(data[0], data[1], downloads, log)).Wait();
-            } 
-
+                if (String.IsNullOrEmpty(downloads)) return 0;
+                log.LogInformation($"{modID} for scan");
+                makeStatEntry(modID, downloads, log);
+                return 1;
+            }
             return 0;
         }
 
-        public static async Task<int> updateTableAsync(string statID, string modID, string downloads, ILogger log) {
+        public static string makeStatEntry(string modID, string downloads, ILogger log)
+        {
             var str = Environment.GetEnvironmentVariable("sqldb_connection");
-
+            string newStatID = String.Empty;
             using (SqlConnection conn = new SqlConnection(str))
             {
                 conn.Open();
                 var sb = new StringBuilder();
-                sb.AppendLine($"UPDATE {tableName} SET modID_{modID} = {downloads} where stat_id = {statID}");
-                
+                sb.AppendLine($"INSERT into {tableName}(stat_time, mod_id, downloads)");
+                sb.AppendLine("VALUES");
+                log.LogInformation($"(CONVERT(smalldatetime, GETDATE()), {modID}, {downloads})");
+                sb.AppendLine($"(CONVERT(smalldatetime, GETDATE()), {modID}, {downloads})");
+                // sb.AppendLine("SELECT SCOPE_IDENTITY()");
+
                 using (SqlCommand cmd = new SqlCommand(sb.ToString(), conn))
                 {
-                    await cmd.ExecuteNonQueryAsync();
+                    Task.Run(() => cmd.ExecuteNonQuery()).Wait();
                 }
+
             }
-            return 0;
+            return newStatID;
         }
 
         public static string getDownloadsForMod(string modID, ILogger log)
