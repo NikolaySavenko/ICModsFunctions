@@ -13,7 +13,6 @@ namespace ICModsFunctions
 {
     public static class UpdateModInfo
     {
-        static readonly string descriptionAPI = "https://icmods.mineprogramming.org/api/description";
         static readonly string tableName = "mods_downloads";
 
         [FunctionName("UpdateModInfo")]
@@ -21,7 +20,7 @@ namespace ICModsFunctions
         {
             if (Int32.TryParse(modID, out int downloadsCount)) {
                 log.LogInformation($"{modID}");
-                string downloads = getDownloadsForMod(modID, log);
+                string downloads = Mineprogramming.GetDownloads(modID);
 
                 if (String.IsNullOrEmpty(downloads)) return 0;
                 log.LogInformation($"{modID} for scan");
@@ -52,36 +51,6 @@ namespace ICModsFunctions
 
             }
             return newStatID;
-        }
-
-        public static string getDownloadsForMod(string modID, ILogger log)
-        {
-            dynamic description = JsonConvert.DeserializeObject(getModDescription(modID, log));
-            return description.downloads;
-        }
-
-        public static string getModDescription(string modID, ILogger log)
-        {
-            string requestURI = getRequestById(modID);
-            var request = WebRequest.Create(requestURI);
-            request.Credentials = CredentialCache.DefaultCredentials;
-
-            var response = request.GetResponse();
-            string description;
-
-            using (Stream dataStream = response.GetResponseStream())
-            {
-                StreamReader reader = new StreamReader(dataStream);
-                description = reader.ReadToEnd();
-                response.Close();
-                reader.Close();
-            }
-            return description;
-        }
-
-        public static string getRequestById(string modID)
-        {
-            return $"{descriptionAPI}?id={modID}";
         }
     }
 }
