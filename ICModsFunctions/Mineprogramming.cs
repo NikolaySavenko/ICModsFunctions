@@ -11,12 +11,17 @@ namespace ICModsFunctions
     {
         public static readonly string API_URL = "https://icmods.mineprogramming.org/api/";
 
-        public static string GetDescription(int id) => MakeRequest($"description?id={id}");
-
-        public static int GetDownloads(int id) {
-            dynamic description = JsonConvert.DeserializeObject(GetDescription(id));
-            return (int) description.downloads;
+        public static List<InnerCoreModData> GetExistingMods() { 
+            var mineprogrammningModList = MakeRequest("list?start=0&count=10000&horizon");
+            return JsonConvert.DeserializeObject<List<InnerCoreModData>>(mineprogrammningModList);
         }
+
+        public static InnerCoreModDescription GetDescription(int id) {
+            var response = MakeRequest($"description?id={id}");
+            return JsonConvert.DeserializeObject<InnerCoreModDescription>(response);
+        }
+
+        public static int GetDownloads(int id) => GetDescription(id).Downloads;
 
         public static string GetDownloads(string id) => (string) GetDownloads((string) id);
 
