@@ -19,11 +19,9 @@ namespace ICModsFunctions
         public static int Run([ActivityTrigger] string modID, ILogger log)
         {
             if (Int32.TryParse(modID, out int downloadsCount)) {
-                log.LogInformation($"{modID}");
                 string downloads = Mineprogramming.GetDownloads(modID);
-
                 if (String.IsNullOrEmpty(downloads)) return 0;
-                log.LogInformation($"{modID} for scan");
+
                 makeStatEntry(modID, downloads, log);
                 return 1;
             }
@@ -40,7 +38,6 @@ namespace ICModsFunctions
                 var sb = new StringBuilder();
                 sb.AppendLine($"INSERT into {tableName}(stat_time, mod_id, downloads)");
                 sb.AppendLine("VALUES");
-                log.LogInformation($"(CONVERT(smalldatetime, GETDATE()), {modID}, {downloads})");
                 sb.AppendLine($"(CONVERT(smalldatetime, GETDATE()), {modID}, {downloads})");
                 // sb.AppendLine("SELECT SCOPE_IDENTITY()");
 

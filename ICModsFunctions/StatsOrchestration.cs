@@ -14,7 +14,6 @@ namespace ICModsFunctions
 {
     public static class StatsOrchestration
     {
-        static readonly int modsForScan = 800;
 
         [FunctionName("StatsOrchestration")]
         public static async Task<int> RunOrchestrator(
@@ -23,11 +22,10 @@ namespace ICModsFunctions
             if (!context.IsReplaying) {
                 var parallelsTasks = new List<Task<int>>();
                 log.LogInformation("START Orchestration");
-                for (int i = 0; i < modsForScan; i++) {
-                    log.LogInformation($"invoked for {i}");
-                    Task<int> task = context.CallActivityAsync<int>("UpdateModInfo", i.ToString());
+                foreach (var mod in Mineprogramming.GetExistingMods()) {
+                    log.LogInformation($"invoked for {mod.Id}");
+                    Task<int> task = context.CallActivityAsync<int>("UpdateModInfo", mod.Id.ToString());
                     parallelsTasks.Add(task);
-                    
                 }
                 await Task.WhenAll(parallelsTasks);
                 log.LogInformation("Finished Orchestration");
