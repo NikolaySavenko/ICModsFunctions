@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Text;
 
 namespace ICModsFunctions
 {
@@ -11,12 +10,14 @@ namespace ICModsFunctions
     {
         public static readonly string API_URL = "https://icmods.mineprogramming.org/api/";
 
-        public static List<InnerCoreModData> GetExistingMods() { 
+        public static List<InnerCoreModData> GetExistingMods()
+        {
             var mineprogrammningModList = MakeRequest("list?start=0&count=10000&horizon");
             return JsonConvert.DeserializeObject<List<InnerCoreModData>>(mineprogrammningModList);
         }
 
-        public static InnerCoreModDescription GetDescription(int id) {
+        public static InnerCoreModDescription GetDescription(int id)
+        {
             var response = MakeRequest($"description?id={id}");
             return JsonConvert.DeserializeObject<InnerCoreModDescription>(response);
         }
@@ -25,7 +26,8 @@ namespace ICModsFunctions
 
         public static string GetDownloads(string id) => GetDownloads(Int32.Parse(id)).ToString();
 
-        private static string MakeRequest(string apiTarget) {
+        private static string MakeRequest(string apiTarget)
+        {
             var requestURI = API_URL + apiTarget;
             var request = WebRequest.Create(requestURI);
             request.Credentials = CredentialCache.DefaultCredentials;
