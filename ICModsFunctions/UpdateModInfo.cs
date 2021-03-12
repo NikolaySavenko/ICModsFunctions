@@ -26,7 +26,7 @@ namespace ICModsFunctions
 		{
 			using (var dbContext = new ICModsStatisticsDatabaseContext())
 			{
-				dbContext.ModsDownloadsTest.Add(new ModsDownloadsTest
+				dbContext.ModsDownloads.Add(new ModsDownloads
 				{
 					StatTime = DateTime.Now,
 					Downloads = Int32.Parse(downloads),
