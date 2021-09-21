@@ -43,8 +43,6 @@ namespace ICModsFunctions.Model.Cosmos
 
         private async Task CreateDatabaseAsync()
         {
-            await _configurationRefresher.TryRefreshAsync();
-
             // Create a new database
             var databaseId = _configuration["CreateICModsMetrics:Settings:databaseId"];
             if (!string.IsNullOrEmpty(databaseId))
@@ -60,7 +58,6 @@ namespace ICModsFunctions.Model.Cosmos
 
         private async Task CreateContainerAsync()
         {
-            await _configurationRefresher.TryRefreshAsync();
             // Create a new container
 
             var containerId = _configuration["CreateICModsMetrics:Settings:containerId"];
@@ -90,6 +87,11 @@ namespace ICModsFunctions.Model.Cosmos
                 ItemResponse<ModStatItem> itemResponse = await this.container.CreateItemAsync(statItem, new PartitionKey(statItem.Id));
                 _logger.LogInformation("Item in database with id: {0} was created\n", itemResponse.Resource.Id);
             }
+        }
+
+        public async Task<bool> TryRefreshConfigAsync()
+        {
+            return await _configurationRefresher.TryRefreshAsync();
         }
 
         public void Dispose()
