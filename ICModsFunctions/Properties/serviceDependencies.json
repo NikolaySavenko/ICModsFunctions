@@ -11,6 +11,10 @@
     "cosmosdb1": {
       "type": "cosmosdb",
       "connectionId": "ConnectionStrings"
+    },
+    "appConfig1": {
+      "type": "appConfig",
+      "connectionId": "AppConfig"
     }
   }
 }

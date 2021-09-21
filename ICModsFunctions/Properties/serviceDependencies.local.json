@@ -12,6 +12,12 @@
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.DocumentDB/databaseAccounts/free-cosmos",
       "type": "cosmosdb.azure",
       "connectionId": "ConnectionStrings"
+    },
+    "appConfig1": {
+      "secretStore": "LocalSecretsFile",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.AppConfiguration/configurationStores/statistics-configuration",
+      "type": "appConfig.azure",
+      "connectionId": "AppConfig"
     }
   }
 }
