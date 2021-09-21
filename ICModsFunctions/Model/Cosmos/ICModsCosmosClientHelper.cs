@@ -1,15 +1,28 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using System.Linq;
+using System.Net;
+using Microsoft.Extensions.Logging;
 
 namespace ICModsFunctions.Model.Cosmos
 {
-    internal class ICModsCosmosClientHelper
+    internal class ICModsCosmosClientHelper : IDisposable
     {
+        // Cloud Config
+        private readonly IConfiguration _configuration;
+        private readonly IConfigurationRefresher _configurationRefresher;
+
+        // Logger
+        private readonly ILogger _logger;
+
         // The Azure Cosmos DB endpoint for running this sample.
-        private static readonly string EndpointUri = Environment.GetEnvironmentVariable("EndPointUri");
+        private static readonly string EndpointUri = Environment.GetEnvironmentVariable("ConnectionStrings:EndPointUri");
 
         // The primary key for the Azure Cosmos account.
-        private static readonly string PrimaryKey = Environment.GetEnvironmentVariable("PrimaryKey");
+        private static readonly string PrimaryKey = Environment.GetEnvironmentVariable("ConnectionStrings:PrimaryKey");
 
         // The Cosmos client instance
         private CosmosClient cosmosClient;
@@ -20,9 +33,68 @@ namespace ICModsFunctions.Model.Cosmos
         // The container we will create.
         private Container container;
 
-        // The name of the database and container we will create
-        private string databaseId = Environment.GetEnvironmentVariable("DatabaseId");
-        private string containerId = Environment.GetEnvironmentVariable("ContainerId");
+        public ICModsCosmosClientHelper(IConfiguration configuration, IConfigurationRefresherProvider refresherProvider, ILogger log)
+        {
+            _logger = log;
+            _configuration = configuration;
+            _configurationRefresher = refresherProvider.Refreshers.First();
+            this.cosmosClient = new CosmosClient(EndpointUri, PrimaryKey, new CosmosClientOptions { ApplicationName = "CreateICModsMetrics" });
+        }
 
+        private async Task CreateDatabaseAsync()
+        {
+            await _configurationRefresher.TryRefreshAsync();
+
+            // Create a new database
+            var databaseId = _configuration["CreateICModsMetrics:Settings:databaseId"];
+            if (!string.IsNullOrEmpty(databaseId))
+            {
+                this.database = await this.cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId);
+                _logger.LogInformation("Database with databaseId: {0} was initialized\n", databaseId);
+            }
+            else
+            {
+                _logger.LogError("Database with databaseId: {0} cannot be initialized\n", databaseId);
+            }
+        }
+
+        private async Task CreateContainerAsync()
+        {
+            await _configurationRefresher.TryRefreshAsync();
+            // Create a new container
+
+            var containerId = _configuration["CreateICModsMetrics:Settings:containerId"];
+            if (!string.IsNullOrEmpty(containerId))
+            {
+                this.container = await this.database.CreateContainerIfNotExistsAsync(containerId, "/id");
+                _logger.LogInformation("Container in database with containerId: {0} was initialized\n", containerId);
+            } else
+            {
+                _logger.LogError("Container in database with containerId: {0} cannot be initialized\n", containerId);
+            }
+        }
+
+        private async Task AddItemsToContainerAsync()
+        {
+            // Create a family object for the Andersen family
+            var statItem = new ModStatItem { Id = 1, ModId = 2, DownloadsCount = 10000, StatTime = DateTime.Now };
+
+            try
+            {
+                // Read the item to see if it exists.  
+                ItemResponse<ModStatItem> itemResponse = await this.container.ReadItemAsync<ModStatItem>(statItem.Id.ToString(), new PartitionKey(statItem.Id));
+                _logger.LogInformation("Item in database with id: {0} already exists\n", itemResponse.Resource.Id);
+            }
+            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+            {
+                ItemResponse<ModStatItem> itemResponse = await this.container.CreateItemAsync(statItem, new PartitionKey(statItem.Id));
+                _logger.LogInformation("Item in database with id: {0} was created\n", itemResponse.Resource.Id);
+            }
+        }
+
+        public void Dispose()
+        {
+            ((IDisposable)cosmosClient).Dispose();
+        }
     }
 }
