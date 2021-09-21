@@ -58,12 +58,11 @@ namespace ICModsFunctions.Model.Cosmos
 
         private async Task CreateContainerAsync()
         {
-            // Create a new container
-
+        // Create a new container
             var containerId = _configuration["CreateICModsMetrics:Settings:containerId"];
             if (!string.IsNullOrEmpty(containerId))
             {
-                this.container = await this.database.CreateContainerIfNotExistsAsync(containerId, "/id");
+                this.container = await this.database.CreateContainerIfNotExistsAsync(containerId, "/ModId");
                 _logger.LogInformation("Container in database with containerId: {0} was initialized\n", containerId);
             } else
             {
@@ -71,20 +70,26 @@ namespace ICModsFunctions.Model.Cosmos
             }
         }
 
-        private async Task AddItemsToContainerAsync()
-        {
-            // Create a family object for the Andersen family
-            var statItem = new ModStatItem { Id = 1, ModId = 2, DownloadsCount = 10000, StatTime = DateTime.Now };
 
+        public async Task AddItemToContainerAsync(ModStatItem statItem)
+        {
+            if (this.container == null)
+            {
+                if (this.database == null)
+                {
+                    await CreateDatabaseAsync();
+                }
+                await CreateContainerAsync();
+            }
             try
             {
                 // Read the item to see if it exists.  
-                ItemResponse<ModStatItem> itemResponse = await this.container.ReadItemAsync<ModStatItem>(statItem.Id.ToString(), new PartitionKey(statItem.Id));
+                ItemResponse<ModStatItem> itemResponse = await this.container.ReadItemAsync<ModStatItem>(statItem.Id.ToString(), new PartitionKey(statItem.ModId));
                 _logger.LogInformation("Item in database with id: {0} already exists\n", itemResponse.Resource.Id);
             }
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
             {
-                ItemResponse<ModStatItem> itemResponse = await this.container.CreateItemAsync(statItem, new PartitionKey(statItem.Id));
+                ItemResponse<ModStatItem> itemResponse = await this.container.CreateItemAsync<ModStatItem>(statItem);
                 _logger.LogInformation("Item in database with id: {0} was created\n", itemResponse.Resource.Id);
             }
         }
