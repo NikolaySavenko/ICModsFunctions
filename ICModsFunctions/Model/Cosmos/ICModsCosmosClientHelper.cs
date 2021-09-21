@@ -33,11 +33,11 @@ namespace ICModsFunctions.Model.Cosmos
         // The container we will create.
         private Container container;
 
-        public ICModsCosmosClientHelper(IConfiguration configuration, IConfigurationRefresherProvider refresherProvider, ILogger log)
+        public ICModsCosmosClientHelper(IConfiguration configuration, IConfigurationRefresher refresher, ILogger log)
         {
             _logger = log;
             _configuration = configuration;
-            _configurationRefresher = refresherProvider.Refreshers.First();
+            _configurationRefresher = refresher;
             this.cosmosClient = new CosmosClient(EndpointUri, PrimaryKey, new CosmosClientOptions { ApplicationName = "CreateICModsMetrics" });
         }
 
