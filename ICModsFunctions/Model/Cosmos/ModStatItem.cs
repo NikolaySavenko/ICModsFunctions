@@ -10,5 +10,7 @@ namespace ICModsFunctions.Model.Cosmos
         public int ModId { get; set; }
         public DateTime StatTime { get; set; }
         public int DownloadsCount { get; set; }
+        public int LikesCount { get; set; }
+        public string ModVersion {  get; set; }
     }
 }
