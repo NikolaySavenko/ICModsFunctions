@@ -46,6 +46,7 @@ namespace ICModsFunctions.Model.Cosmos
             var helper = new ICModsCosmosClientHelper(configuration, refresher, log);
             helper.ConfigureCosmosClient();
             await helper.ConfigureDatabaseAndContainer();
+            await helper._configurationRefresher.RefreshAsync();
             return helper;
         }
 
