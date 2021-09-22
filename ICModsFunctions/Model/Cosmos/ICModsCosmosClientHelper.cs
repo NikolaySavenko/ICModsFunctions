@@ -33,12 +33,38 @@ namespace ICModsFunctions.Model.Cosmos
         // The container we will create.
         private Container container;
 
-        public ICModsCosmosClientHelper(IConfiguration configuration, IConfigurationRefresher refresher, ILogger log)
+        private ICModsCosmosClientHelper(IConfiguration configuration, IConfigurationRefresher refresher, ILogger log)
         {
             _logger = log;
             _configuration = configuration;
             _configurationRefresher = refresher;
-            this.cosmosClient = new CosmosClient(EndpointUri, PrimaryKey, new CosmosClientOptions { 
+        }
+        
+        // Looks like a factory method
+        public static async Task<ICModsCosmosClientHelper> BuildHelper(IConfiguration configuration, IConfigurationRefresher refresher, ILogger log)
+        {
+            var helper = new ICModsCosmosClientHelper(configuration, refresher, log);
+            helper.ConfigureCosmosClient();
+            await helper.ConfigureDatabaseAndContainer();
+            return helper;
+        }
+
+        private async Task ConfigureDatabaseAndContainer()
+        {
+            if (this.container == null)
+            {
+                if (this.database == null)
+                {
+                    await CreateDatabaseAsync();
+                }
+                await CreateContainerAsync();
+            }
+        }
+
+        private void ConfigureCosmosClient()
+        {
+            this.cosmosClient = new CosmosClient(EndpointUri, PrimaryKey, new CosmosClientOptions
+            {
                 ApplicationName = "CreateICModsMetrics",
                 AllowBulkExecution = true
             });
@@ -61,7 +87,7 @@ namespace ICModsFunctions.Model.Cosmos
 
         private async Task CreateContainerAsync()
         {
-        // Create a new container
+            // Create a new container
             var containerId = _configuration["CreateICModsMetrics:Settings:containerId"];
             if (!string.IsNullOrEmpty(containerId))
             {
@@ -76,14 +102,6 @@ namespace ICModsFunctions.Model.Cosmos
 
         public async Task AddItemToContainerAsync(ModStatItem statItem)
         {
-            if (this.container == null)
-            {
-                if (this.database == null)
-                {
-                    await CreateDatabaseAsync();
-                }
-                await CreateContainerAsync();
-            }
             try
             {
                 // Read the item to see if it exists.  
