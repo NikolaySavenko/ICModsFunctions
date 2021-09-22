@@ -38,7 +38,10 @@ namespace ICModsFunctions.Model.Cosmos
             _logger = log;
             _configuration = configuration;
             _configurationRefresher = refresher;
-            this.cosmosClient = new CosmosClient(EndpointUri, PrimaryKey, new CosmosClientOptions { ApplicationName = "CreateICModsMetrics" });
+            this.cosmosClient = new CosmosClient(EndpointUri, PrimaryKey, new CosmosClientOptions { 
+                ApplicationName = "CreateICModsMetrics",
+                AllowBulkExecution = true
+            });
         }
 
         private async Task CreateDatabaseAsync()
