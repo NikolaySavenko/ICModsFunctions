@@ -106,7 +106,7 @@ namespace ICModsFunctions.Model.Cosmos
             try
             {
                 // Read the item to see if it exists.  
-                ItemResponse<ModStatItem> itemResponse = await this.container.ReadItemAsync<ModStatItem>(statItem.Id.ToString(), new PartitionKey(statItem.ModId));
+                ItemResponse<ModStatItem> itemResponse = await this.container.ReadItemAsync<ModStatItem>(statItem.Id, new PartitionKey(statItem.ModId));
                 _logger.LogInformation("Item in database with id: {0} already exists\n", itemResponse.Resource.Id);
             }
             catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
