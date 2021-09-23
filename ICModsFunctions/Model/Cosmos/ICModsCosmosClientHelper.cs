@@ -103,17 +103,8 @@ namespace ICModsFunctions.Model.Cosmos
 
         public async Task AddItemToContainerAsync(ModStatItem statItem)
         {
-            try
-            {
-                // Read the item to see if it exists.  
-                ItemResponse<ModStatItem> itemResponse = await this.container.ReadItemAsync<ModStatItem>(statItem.Id, new PartitionKey(statItem.ModId));
-                _logger.LogInformation("Item in database with id: {0} already exists\n", itemResponse.Resource.Id);
-            }
-            catch (CosmosException ex) when (ex.StatusCode == HttpStatusCode.NotFound)
-            {
-                ItemResponse<ModStatItem> itemResponse = await this.container.CreateItemAsync<ModStatItem>(statItem);
-                _logger.LogInformation("Item in database with id: {0} was created\n", itemResponse.Resource.Id);
-            }
+            ItemResponse<ModStatItem> itemResponse = await this.container.CreateItemAsync<ModStatItem>(statItem);
+            _logger.LogInformation("Item in database with id: {0} was created\n", itemResponse.Resource.Id);
         }
 
         public async Task<bool> TryRefreshConfigAsync()
