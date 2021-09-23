@@ -43,7 +43,7 @@ namespace ICModsFunctions
             var date = DateTime.Now;
             var item = new ModStatItem
             {
-                Id = String.GetHashCode(date.ToString()).ToString(),
+                Id = Guid.NewGuid().ToString(),
                 ModId = modId,
                 StatTime = date,
                 DownloadsCount = description.Downloads,
