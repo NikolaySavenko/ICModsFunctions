@@ -2,40 +2,42 @@ using System;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
-using ICModsFunctions.Model;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.AzureAppConfiguration;
+using System.Linq;
+using ICModsFunctions.Model.Cosmos;
+using System.Threading.Tasks;
 
 namespace ICModsFunctions
 {
-	public static class UpdateModInfo
+    public class UpdateModInfo
 	{
-		[FunctionName("UpdateModInfo")]
-		public static int Run([ActivityTrigger] string modID, ILogger log)
-		{
-			if (Int32.TryParse(modID, out int downloadsCount))
-			{
-				string downloads = Mineprogramming.GetDownloads(modID);
-				if (String.IsNullOrEmpty(downloads)) return 0;
+		private readonly IConfiguration _configuration;
+		private readonly IConfigurationRefresher _configurationRefresher;
 
-				MakeStatEntry(modID, downloads, log);
-				return 1;
-			}
-			return 0;
+		public UpdateModInfo(IConfiguration configuration, IConfigurationRefresherProvider refresherProvider)
+		{
+			_configuration = configuration;
+			_configurationRefresher = refresherProvider.Refreshers.First();
 		}
 
-		public static string MakeStatEntry(string modID, string downloads, ILogger log)
+		[FunctionName("UpdateModInfo")]
+		public async Task<int> RunAsync([ActivityTrigger] int modID, ILogger log)
 		{
-			using (var dbContext = new ICModsStatisticsDatabaseContext())
+			var description = Mineprogramming.GetDescription(modID);
+			var date = DateTime.Now;
+			var item = new ModStatItem
 			{
-				dbContext.ModsDownloads.Add(new ModsDownloads
-				{
-					StatTime = DateTime.Now,
-					Downloads = Int32.Parse(downloads),
-					ModId = Int32.Parse(modID)
-				});
-				log.LogInformation($"invoked for {modID}");
-				dbContext.SaveChanges();
-			}
-			return "";
+				Id = Guid.NewGuid().ToString(),
+				ModId = modID,
+				StatTime = date,
+				DownloadsCount = description.Downloads,
+				LikesCount = description.Likes,
+				ModVersion = description.VersionName
+			};
+			using var helper = await ICModsCosmosClientHelper.BuildHelper(_configuration, _configurationRefresher, log);
+			await helper.AddItemToContainerAsync(item);
+			return 1;
 		}
 	}
 }

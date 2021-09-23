@@ -23,8 +23,7 @@ namespace ICModsFunctions
 				log.LogInformation("START Orchestration");
 				foreach (var mod in Mineprogramming.GetExistingMods())
 				{
-					
-					Task<int> task = context.CallActivityAsync<int>("UpdateModInfo", mod.Id.ToString());
+					Task<int> task = context.CallActivityAsync<int>("UpdateModInfo", mod.Id);
 					parallelsTasks.Add(task);
 				}
 				await Task.WhenAll(parallelsTasks);

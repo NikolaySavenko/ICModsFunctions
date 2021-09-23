@@ -24,8 +24,6 @@ namespace ICModsFunctions
 
         public static int GetDownloads(int id) => GetDescription(id).Downloads;
 
-        public static string GetDownloads(string id) => GetDownloads(Int32.Parse(id)).ToString();
-
         private static string MakeRequest(string apiTarget)
         {
             var requestURI = API_URL + apiTarget;
