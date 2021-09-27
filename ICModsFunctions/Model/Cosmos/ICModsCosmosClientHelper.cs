@@ -3,9 +3,8 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
-using System.Linq;
-using System.Net;
 using Microsoft.Extensions.Logging;
+using ICModsFunctions.Configuration;
 
 namespace ICModsFunctions.Model.Cosmos
 {
@@ -66,7 +65,7 @@ namespace ICModsFunctions.Model.Cosmos
         {
             this.cosmosClient = new CosmosClient(EndpointUri, PrimaryKey, new CosmosClientOptions
             {
-                ApplicationName = "CreateICModsMetrics",
+                ApplicationName = ConfigurationHelper.AppName,
                 AllowBulkExecution = true
             });
         }
@@ -74,7 +73,7 @@ namespace ICModsFunctions.Model.Cosmos
         private async Task CreateDatabaseAsync()
         {
             // Create a new database
-            var databaseId = _configuration["CreateICModsMetrics:Settings:databaseId"];
+            var databaseId = _configuration[ConfigurationHelper.DatabaseId];
             if (!string.IsNullOrEmpty(databaseId))
             {
                 this.database = await this.cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId);
@@ -89,7 +88,7 @@ namespace ICModsFunctions.Model.Cosmos
         private async Task CreateContainerAsync()
         {
             // Create a new container
-            var containerId = _configuration["CreateICModsMetrics:Settings:containerId"];
+            var containerId = _configuration[ConfigurationHelper.ContainerId];
             if (!string.IsNullOrEmpty(containerId))
             {
                 this.container = await this.database.CreateContainerIfNotExistsAsync(containerId, "/ModId");
