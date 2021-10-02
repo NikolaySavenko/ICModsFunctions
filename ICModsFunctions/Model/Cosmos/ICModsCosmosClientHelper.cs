@@ -102,8 +102,13 @@ namespace ICModsFunctions.Model.Cosmos
 
         public async Task AddItemToContainerAsync(ModStatItem statItem)
         {
-            ItemResponse<ModStatItem> itemResponse = await this.container.CreateItemAsync<ModStatItem>(statItem);
-            _logger.LogInformation("Item in database with id: {0} was created\n", itemResponse.Resource.Id);
+            try
+            {
+                ItemResponse<ModStatItem> itemResponse = await this.container.CreateItemAsync<ModStatItem>(statItem);
+            } catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+            }
         }
 
         public async Task<bool> TryRefreshConfigAsync()
