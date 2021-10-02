@@ -6,7 +6,8 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
-using ICModsFunctions.Model;
+using System;
+using Newtonsoft.Json;
 
 namespace ICModsFunctions
 {
@@ -14,22 +15,27 @@ namespace ICModsFunctions
 	{
 
 		[FunctionName("StatsOrchestration")]
-		public static async Task<int> RunOrchestrator(
+		public static async Task<List<InnerCoreModDescription>> RunOrchestrator(
 			[OrchestrationTrigger] IDurableOrchestrationContext context, ILogger log)
 		{
-			if (!context.IsReplaying)
-			{
-				var parallelsTasks = new List<Task<int>>();
-				log.LogInformation("START Orchestration");
-				foreach (var mod in Mineprogramming.GetExistingMods())
-				{
-					Task<int> task = context.CallActivityAsync<int>("UpdateModInfo", mod.Id);
-					parallelsTasks.Add(task);
-				}
-				await Task.WhenAll(parallelsTasks);
-				log.LogInformation("Finished Orchestration");
+			Uri uri = new Uri("https://icmods.mineprogramming.org/api/list?start=0&count=10000&horizon");
+			var listPesponse = await context.CallHttpAsync(HttpMethod.Get, uri);
+			List<InnerCoreModData> modsList = JsonConvert.DeserializeObject<List<InnerCoreModData>>(listPesponse.Content);
+			var parallelsTasks = new List<Task<DurableHttpResponse>>();
+			foreach (var modData in modsList)
+            {
+				Uri descriptionUri = new Uri($"https://icmods.mineprogramming.org/api/description?id={modData.Id}");
+				parallelsTasks.Add(context.CallHttpAsync(HttpMethod.Get, descriptionUri));
+            }
+			var responses = await Task.WhenAll(parallelsTasks);
+			var modDescriptions = new List<InnerCoreModDescription>();
+			foreach(var response in responses)
+            {
+				var description = JsonConvert.DeserializeObject<InnerCoreModDescription>(response.Content);
+				modDescriptions.Add(description);
 			}
-			return 0;
+			await context.CallActivityAsync("UpdateCosmosStats", modDescriptions);
+			return modDescriptions;
 		}
 
 
@@ -43,7 +49,6 @@ namespace ICModsFunctions
 			string instanceId = await starter.StartNewAsync("StatsOrchestration", null);
 
 			log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
-
 			return starter.CreateCheckStatusResponse(req, instanceId);
 		}
 	}
