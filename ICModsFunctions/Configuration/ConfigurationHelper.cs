@@ -43,5 +43,14 @@ namespace ICModsFunctions.Configuration
                 return $"{AppName}:{CurrentPrefix}:ContainerId";
             }
         }
+
+        public static string MaxCosmosConcurrency
+        {
+            get
+            {
+                // CreateICModsMetrics: Settings: MaxCosmosConcurrency
+                return $"{AppName}:{CurrentPrefix}:MaxCosmosConcurrency";
+            }
+        }
     }
 }
