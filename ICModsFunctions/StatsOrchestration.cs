@@ -8,6 +8,8 @@ using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using System;
 using Newtonsoft.Json;
+using ApplicationCore;
+using ApplicationCore.Model.InnerCore;
 
 namespace ICModsFunctions
 {

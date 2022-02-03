@@ -1,12 +1,13 @@
-﻿using Newtonsoft.Json;
+﻿using ApplicationCore.Model.InnerCore;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 
-namespace ICModsFunctions
+namespace ApplicationCore
 {
-    class Mineprogramming
+    public class Mineprogramming
     {
         public static readonly string API_URL = "https://icmods.mineprogramming.org/api/";
 

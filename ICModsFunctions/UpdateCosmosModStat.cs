@@ -10,10 +10,12 @@ using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using ICModsFunctions.Model.Cosmos;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
 using System;
+using ApplicationCore;
+using ApplicationCore.Model.Cosmos;
+using Infrastructure.Data.Cosmos;
 
 namespace ICModsFunctions
 {

@@ -1,9 +1,9 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace ICModsFunctions.Model.Cosmos
+namespace ApplicationCore.Model.Cosmos
 {
-    internal class ModStatItem
+    public class ModStatItem
     {
         [JsonProperty(PropertyName = "id")]
         public string Id { get; set; }

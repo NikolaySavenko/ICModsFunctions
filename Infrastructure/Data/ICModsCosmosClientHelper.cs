@@ -3,10 +3,11 @@ using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using ApplicationCore.Model.Cosmos;
 
-namespace ICModsFunctions.Model.Cosmos
+namespace Infrastructure.Data.Cosmos
 {
-    internal class ICModsCosmosClientHelper : IDisposable
+    public class ICModsCosmosClientHelper : IDisposable
     {
         // Logger
         private readonly ILogger _logger;
