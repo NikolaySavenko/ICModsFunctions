@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Logging;
 
 namespace ICModsFunctions.Model.Cosmos

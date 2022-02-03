@@ -10,7 +10,6 @@ using Microsoft.Azure.WebJobs.Extensions.DurableTask;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Logging;
 
 namespace ICModsFunctions
@@ -18,12 +17,10 @@ namespace ICModsFunctions
     public class UpdateCosmosStats
     {
         private readonly IConfiguration _configuration;
-        private readonly IConfigurationRefresher _configurationRefresher;
 
-        public UpdateCosmosStats(IConfiguration configuration, IConfigurationRefresherProvider refresherProvider)
+        public UpdateCosmosStats(IConfiguration configuration)
         {
             _configuration = configuration;
-            _configurationRefresher = refresherProvider.Refreshers.First();
         }
 
         [FunctionName("UpdateCosmosStats")]

@@ -10,7 +10,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Attributes;
 using Microsoft.Azure.WebJobs.Extensions.OpenApi.Core.Enums;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
@@ -20,12 +19,10 @@ namespace ICModsFunctions
     public class ManualUpdateCosmosModStat {
 
         private readonly IConfiguration _configuration;
-        private readonly IConfigurationRefresher _configurationRefresher;
 
-        public ManualUpdateCosmosModStat(IConfiguration configuration, IConfigurationRefresherProvider refresherProvider)
+        public ManualUpdateCosmosModStat(IConfiguration configuration)
         {
             _configuration = configuration;
-            _configurationRefresher = refresherProvider.Refreshers.First();
         }
 
         [FunctionName("ManualUpdateCosmosModStat")]

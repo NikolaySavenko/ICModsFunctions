@@ -12,7 +12,6 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using ICModsFunctions.Model.Cosmos;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using System.Linq;
 using System;
 
@@ -21,12 +20,10 @@ namespace ICModsFunctions
     public class UpdateCosmosModStat
     {
         private readonly IConfiguration _configuration;
-        private readonly IConfigurationRefresher _configurationRefresher;
 
-        public UpdateCosmosModStat(IConfiguration configuration, IConfigurationRefresherProvider refresherProvider)
+        public UpdateCosmosModStat(IConfiguration configuration)
         {
             _configuration = configuration;
-            _configurationRefresher = refresherProvider.Refreshers.First();
         }
 
         [FunctionName("UpdateCosmosModStat")]
