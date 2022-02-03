@@ -4,16 +4,11 @@ using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 using Microsoft.Extensions.Logging;
-using ICModsFunctions.Configuration;
 
 namespace ICModsFunctions.Model.Cosmos
 {
     internal class ICModsCosmosClientHelper : IDisposable
     {
-        // Cloud Config
-        private readonly IConfiguration _configuration;
-        private readonly IConfigurationRefresher _configurationRefresher;
-
         // Logger
         private readonly ILogger _logger;
 
@@ -32,20 +27,17 @@ namespace ICModsFunctions.Model.Cosmos
         // The container we will create.
         private Container container;
 
-        private ICModsCosmosClientHelper(IConfiguration configuration, IConfigurationRefresher refresher, ILogger log)
+        private ICModsCosmosClientHelper(ILogger log)
         {
             _logger = log;
-            _configuration = configuration;
-            _configurationRefresher = refresher;
         }
         
         // Looks like a factory method
-        public static async Task<ICModsCosmosClientHelper> BuildHelper(IConfiguration configuration, IConfigurationRefresher refresher, ILogger log)
+        public static async Task<ICModsCosmosClientHelper> BuildHelper(ILogger log)
         {
-            var helper = new ICModsCosmosClientHelper(configuration, refresher, log);
+            var helper = new ICModsCosmosClientHelper(log);
             helper.ConfigureCosmosClient();
             await helper.ConfigureDatabaseAndContainer();
-            await helper._configurationRefresher.RefreshAsync();
             return helper;
         }
 
@@ -65,7 +57,7 @@ namespace ICModsFunctions.Model.Cosmos
         {
             this.cosmosClient = new CosmosClient(EndpointUri, PrimaryKey, new CosmosClientOptions
             {
-                ApplicationName = ConfigurationHelper.AppName,
+                ApplicationName = "ICModsFunctions",
                 AllowBulkExecution = true
             });
         }
@@ -73,7 +65,7 @@ namespace ICModsFunctions.Model.Cosmos
         private async Task CreateDatabaseAsync()
         {
             // Create a new database
-            var databaseId = _configuration[ConfigurationHelper.DatabaseId];
+            var databaseId = Environment.GetEnvironmentVariable("DatabaseId");
             if (!string.IsNullOrEmpty(databaseId))
             {
                 this.database = await this.cosmosClient.CreateDatabaseIfNotExistsAsync(databaseId);
@@ -88,7 +80,7 @@ namespace ICModsFunctions.Model.Cosmos
         private async Task CreateContainerAsync()
         {
             // Create a new container
-            var containerId = _configuration[ConfigurationHelper.ContainerId];
+            var containerId = Environment.GetEnvironmentVariable("ContainerId");
             if (!string.IsNullOrEmpty(containerId))
             {
                 this.container = await this.database.CreateContainerIfNotExistsAsync(containerId, "/ModId");
@@ -109,11 +101,6 @@ namespace ICModsFunctions.Model.Cosmos
             {
                 _logger.LogError(ex.ToString());
             }
-        }
-
-        public async Task<bool> TryRefreshConfigAsync()
-        {
-            return await _configurationRefresher.TryRefreshAsync();
         }
 
         public void Dispose()

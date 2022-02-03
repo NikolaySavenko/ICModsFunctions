@@ -50,7 +50,7 @@ namespace ICModsFunctions
                 LikesCount = description.Likes,
                 ModVersion = description.VersionName
             };
-            using var helper = await ICModsCosmosClientHelper.BuildHelper(_configuration, _configurationRefresher, log);
+            using var helper = await ICModsCosmosClientHelper.BuildHelper(log);
             await helper.AddItemToContainerAsync(item);
 
             string responseMessage = JsonConvert.SerializeObject(item);

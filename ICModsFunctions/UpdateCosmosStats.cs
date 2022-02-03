@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using ICModsFunctions.Configuration;
 using ICModsFunctions.Model.Cosmos;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.DurableTask;
@@ -30,9 +29,9 @@ namespace ICModsFunctions
         [FunctionName("UpdateCosmosStats")]
         public async Task Run([ActivityTrigger] List<InnerCoreModDescription> modsDescriptions, ILogger log)
         {
-            using (var helper = await ICModsCosmosClientHelper.BuildHelper(_configuration, _configurationRefresher, log))
+            using (var helper = await ICModsCosmosClientHelper.BuildHelper(log))
             {
-                var maxConcurrency = int.Parse(_configuration[ConfigurationHelper.MaxCosmosConcurrency]);
+                var maxConcurrency = int.Parse(Environment.GetEnvironmentVariable("MaxCosmosConcurrency"));
                 using(var semaphore = new SemaphoreSlim(maxConcurrency))
                 {
                     var tasks = new List<Task>();
