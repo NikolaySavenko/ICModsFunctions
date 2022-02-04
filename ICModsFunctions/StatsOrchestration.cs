@@ -31,12 +31,14 @@ namespace ICModsFunctions
             }
 			var responses = await Task.WhenAll(parallelsTasks);
 			var modDescriptions = new List<InnerCoreModDescription>();
+			var dbWrites = new List<Task>();
 			foreach(var response in responses)
             {
 				var description = JsonConvert.DeserializeObject<InnerCoreModDescription>(response.Content);
 				modDescriptions.Add(description);
+				dbWrites.Add(context.CallActivityAsync("WriteCosmosStat", description));
 			}
-			await context.CallActivityAsync("UpdateCosmosStats", modDescriptions);
+			await Task.WhenAll(dbWrites);
 			return modDescriptions;
 		}
 
