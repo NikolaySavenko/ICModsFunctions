@@ -14,7 +14,6 @@ namespace ICModsFunctions
     public static class MakeDailyStats
     {
         [FunctionName("MakeDailyStats")]
-        [Disable]
         public static void Run([TimerTrigger("0 0 * * * *")]TimerInfo myTimer, [DurableClient] IDurableOrchestrationClient starter, ILogger log)
         {
             log.LogInformation($"C# Timer trigger MakeDailyStats executed at: {DateTime.Now} on Hub {starter.TaskHubName}");
