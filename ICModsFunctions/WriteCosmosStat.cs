@@ -13,8 +13,8 @@ namespace ICModsFunctions
         public static void Run(
             [ActivityTrigger] InnerCoreModDescription description,
             [CosmosDB(
-                databaseName: "ToDoItems",
-                collectionName: "Items",
+                databaseName: "ICModsStatistics",
+                collectionName: "Container0",
                 ConnectionStringSetting = "CosmosDBConnection",
                 PartitionKey = "/ModId",
                 CreateIfNotExists = true
