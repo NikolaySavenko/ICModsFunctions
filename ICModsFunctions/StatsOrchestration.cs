@@ -29,7 +29,7 @@ namespace ICModsFunctions
 				Uri descriptionUri = new Uri($"https://icmods.mineprogramming.org/api/description?id={modData.Id}");
 				parallelsTasks.Add(context.CallHttpAsync(HttpMethod.Get, descriptionUri));
             }
-			var responses = await Task.WhenAll(parallelsTasks).ConfigureAwait(false);
+			var responses = await Task.WhenAll(parallelsTasks);
 			var modDescriptions = new List<InnerCoreModDescription>();
 			var dbWrites = new List<Task>();
 			foreach(var response in responses)
@@ -38,7 +38,7 @@ namespace ICModsFunctions
 				modDescriptions.Add(description);
 				dbWrites.Add(context.CallActivityAsync("WriteCosmosStat", description));
 			}
-			await Task.WhenAll(dbWrites).ConfigureAwait(false);
+			await Task.WhenAll(dbWrites);
 			return modDescriptions;
 		}
 
