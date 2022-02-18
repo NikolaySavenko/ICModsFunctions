@@ -14,7 +14,7 @@ namespace ICModsFunctions
             [ActivityTrigger] InnerCoreModDescription description,
             [CosmosDB(
                 databaseName: "ICModsStatistics",
-                collectionName: "Container0",
+                collectionName: "Main",
                 ConnectionStringSetting = "CosmosDBConnection",
                 PartitionKey = "/ModId",
                 CreateIfNotExists = true
