@@ -16,7 +16,7 @@ namespace ICModsFunctions
 	public static class StatsOrchestration
 	{
 
-		[FunctionName("StatsOrchestration")]
+		[FunctionName("OrchestrateStatistics")]
 		public static async Task<List<InnerCoreModDescription>> RunOrchestrator(
 			[OrchestrationTrigger] IDurableOrchestrationContext context, ILogger log)
 		{
@@ -50,7 +50,7 @@ namespace ICModsFunctions
 			ILogger log)
 		{
 			// Function input comes from the request content.
-			string instanceId = await starter.StartNewAsync("StatsOrchestration", null);
+			string instanceId = await starter.StartNewAsync("OrchestrateStatistics", null);
 
 			log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
 			return starter.CreateCheckStatusResponse(req, instanceId);

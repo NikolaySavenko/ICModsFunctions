@@ -7,7 +7,7 @@ using System;
 
 namespace ICModsFunctions
 {
-	public static class WriteCosmosStat
+	public static class CosmosWriter
     {
         [FunctionName("WriteCosmosStat")]
         public static void Run(
