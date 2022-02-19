@@ -13,11 +13,11 @@ namespace ICModsFunctions
 {
     public static class StatisticsTimer
     {
-        [FunctionName("MakeDailyStats")]
-        public static void Run([TimerTrigger("0 0 * * * *")]TimerInfo myTimer, [DurableClient] IDurableOrchestrationClient starter, ILogger log)
+        [FunctionName(nameof(MakeDailyStats))]
+        public static void MakeDailyStats([TimerTrigger("0 0 * * * *")]TimerInfo myTimer, [DurableClient] IDurableOrchestrationClient starter, ILogger log)
         {
             log.LogInformation($"C# Timer trigger MakeDailyStats executed at: {DateTime.Now} on Hub {starter.TaskHubName}");
-            starter.StartNewAsync("OrchestrateStatistics");
+            starter.StartNewAsync(nameof(StatsOrchestration.RunStatisticsOrchestrator));
         }
     }
 }

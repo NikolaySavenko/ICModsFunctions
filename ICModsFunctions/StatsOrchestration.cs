@@ -16,8 +16,8 @@ namespace ICModsFunctions
 	public static class StatsOrchestration
 	{
 
-		[FunctionName("OrchestrateStatistics")]
-		public static async Task<List<InnerCoreModDescription>> RunOrchestrator(
+		[FunctionName(nameof(RunStatisticsOrchestrator))]
+		public static async Task<List<InnerCoreModDescription>> RunStatisticsOrchestrator(
 			[OrchestrationTrigger] IDurableOrchestrationContext context, ILogger log)
 		{
 			Uri uri = new Uri("https://icmods.mineprogramming.org/api/list?start=0&count=10000&horizon");
@@ -36,7 +36,7 @@ namespace ICModsFunctions
 			{
 				var description = JsonConvert.DeserializeObject<InnerCoreModDescription>(response.Content);
 				modDescriptions.Add(description);
-				dbWrites.Add(context.CallActivityAsync("WriteCosmosStat", description));
+				dbWrites.Add(context.CallActivityAsync(nameof(CosmosWriter.WriteCosmosStat), description));
 			}
 			await Task.WhenAll(dbWrites);
 			return modDescriptions;
@@ -50,7 +50,7 @@ namespace ICModsFunctions
 			ILogger log)
 		{
 			// Function input comes from the request content.
-			string instanceId = await starter.StartNewAsync("OrchestrateStatistics", null);
+			string instanceId = await starter.StartNewAsync(nameof(RunStatisticsOrchestrator), null);
 
 			log.LogInformation($"Started orchestration with ID = '{instanceId}'.");
 			return starter.CreateCheckStatusResponse(req, instanceId);

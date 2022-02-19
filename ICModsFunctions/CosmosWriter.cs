@@ -9,8 +9,8 @@ namespace ICModsFunctions
 {
 	public static class CosmosWriter
     {
-        [FunctionName("WriteCosmosStat")]
-        public static void Run(
+        [FunctionName(nameof(WriteCosmosStat))]
+        public static void WriteCosmosStat(
             [ActivityTrigger] InnerCoreModDescription description,
             [CosmosDB(
                 databaseName: "ICModsStatistics",
