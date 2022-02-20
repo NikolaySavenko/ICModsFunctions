@@ -4,7 +4,7 @@
   "parameters": {
     "resourceGroupName": {
       "type": "string",
-      "defaultValue": "ICModsStatistics",
+      "defaultValue": "test-group",
       "metadata": {
         "_parameterType": "resourceGroup",
         "description": "Name of the resource group for the resource. It is recommended to put resources under same resource group for better tracking."
@@ -36,7 +36,7 @@
     },
     {
       "type": "Microsoft.Resources/deployments",
-      "name": "[concat(parameters('resourceGroupName'), 'Deployment', uniqueString(concat('CreateICModsMetrics', subscription().subscriptionId)))]",
+      "name": "[concat(parameters('resourceGroupName'), 'Deployment', uniqueString(concat('free-cosmos', subscription().subscriptionId)))]",
       "resourceGroup": "[parameters('resourceGroupName')]",
       "apiVersion": "2019-10-01",
       "dependsOn": [
@@ -45,16 +45,21 @@
       "properties": {
         "mode": "Incremental",
         "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
           "contentVersion": "1.0.0.0",
           "resources": [
             {
-              "name": "CreateICModsMetrics",
-              "type": "microsoft.insights/components",
+              "name": "free-cosmos",
               "location": "[parameters('resourceLocation')]",
-              "kind": "web",
-              "properties": {},
-              "apiVersion": "2015-05-01"
+              "type": "Microsoft.DocumentDB/databaseAccounts",
+              "kind": "GlobalDocumentDB",
+              "systemData": {
+                "createdAt": "2021-05-26T15:47:32.4840868Z"
+              },
+              "properties": {
+                "databaseAccountOfferType": "Standard"
+              },
+              "apiVersion": "2015-04-08"
             }
           ]
         }
@@ -62,6 +67,6 @@
     }
   ],
   "metadata": {
-    "_dependencyType": "appInsights.azure"
+    "_dependencyType": "cosmosdb.azure"
   }
 }

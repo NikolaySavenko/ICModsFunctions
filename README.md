@@ -4,3 +4,9 @@
 
 Helps with creation and collecting of ICMods downloads metrics
 Uses Azure to make durable function invoke
+
+
+## Recomendations
+
+### CosmosDB
+Use serverless plan to prevent throutput problems (429)
