@@ -23,7 +23,6 @@ namespace ICModsFunctions
         {
             var item = new ModStatItem
             {
-                Id = Guid.NewGuid().ToString(),
                 ModId = description.Id,
                 StatTime = DateTime.UtcNow,
                 DownloadsCount = description.Downloads,
