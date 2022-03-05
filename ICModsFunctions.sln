@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICModsFunctions", "ICModsFu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApplicationCore", "ApplicationCore\ApplicationCore.csproj", "{5880CFE6-EA28-4347-9DE8-99D98AC5FF83}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphService", "GraphService\GraphService.csproj", "{2158CEDB-0259-45E3-993D-61520ACFF7B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GraphApiService", "GraphApiService\GraphApiService.csproj", "{2158CEDB-0259-45E3-993D-61520ACFF7B9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{01C4280A-B35D-40A0-A909-671087CD7C9C}"
 EndProject

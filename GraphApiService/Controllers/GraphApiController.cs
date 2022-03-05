@@ -1,7 +1,7 @@
 ﻿using Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GraphService.Controllers;
+namespace GraphApiService.Controllers;
 
 [ApiController]
 [Route("[controller]")]

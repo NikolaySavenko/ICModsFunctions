@@ -7,16 +7,16 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["GraphService/GraphService.csproj", "GraphService/"]
-RUN dotnet restore "GraphService/GraphService.csproj"
+COPY ["GraphApiService/GraphApiService.csproj", "GraphApiService/"]
+RUN dotnet restore "GraphApiService/GraphApiService.csproj"
 COPY . .
-WORKDIR "/src/GraphService"
-RUN dotnet build "GraphService.csproj" -c Release -o /app/build
+WORKDIR "/src/GraphApiService"
+RUN dotnet build "GraphApiService.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "GraphService.csproj" -c Release -o /app/publish
+RUN dotnet publish "GraphApiService.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "GraphService.dll"]
+ENTRYPOINT ["dotnet", "GraphApiService.dll"]

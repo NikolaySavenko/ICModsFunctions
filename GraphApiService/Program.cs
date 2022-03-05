@@ -1,4 +1,4 @@
-using GraphService;
+using GraphApiService;
 using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 
